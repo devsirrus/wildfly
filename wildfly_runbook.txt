@@ -1,22 +1,22 @@
-¡openjdk install(java-1.8.0-openjdk)
+â– openjdk install(java-1.8.0-openjdk)
 yum install java
 
-¡wildflyƒCƒ“ƒXƒg[ƒ‹
-# /opt”z‰º‚Ézipİ’u
+â– wildflyã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«
+# /opté…ä¸‹ã«zipè¨­ç½®
 # wget https://download.jboss.org/wildfly/14.0.0.Final/wildfly-14.0.0.Final.zip
 cd /opt
 unzip wildfly-14.0.0.Final.zip
 rm wildfly-14.0.0.Final.zip
 
-¡wildflyƒ†[ƒUì¬
+â– wildflyãƒ¦ãƒ¼ã‚¶ä½œæˆ
 groupadd -r wildfly
 useradd -r -g wildfly -d /opt/wildfly -s /sbin/nologin wildfly
 
-¡/opt/wildfly‚ÅƒVƒ“ƒ{ƒŠƒbƒNƒŠƒ“ƒNì¬(“¯«systemd/version up‘Îô)
+â– /opt/wildflyã§ã‚·ãƒ³ãƒœãƒªãƒƒã‚¯ãƒªãƒ³ã‚¯ä½œæˆ(åŒæ¢±systemd/version upå¯¾ç­–)
 ln -s /opt/wildfly-14.0.0.Final /opt/wildfly
 chown -R wildfly:wildfly /opt/wildfly/
 
-¡wildfly.confì¬/systemd“o˜^
+â– wildfly.confä½œæˆ/systemdç™»éŒ²
 # cf /opt/wildfly/docs/contrib/scripts/systemd/README
 cd /opt/wildfly/docs/contrib/scripts/systemd/
 mkdir /etc/wildfly
@@ -26,64 +26,64 @@ cp -p launch.sh /opt/wildfly/bin/
 chmod +x /opt/wildfly/bin/launch.sh
 systemctl enable wildfly.service
 
-¡wildfly‹N“®ƒ‚[ƒh‚ğstandalone-full‚Ö
+â– wildflyèµ·å‹•ãƒ¢ãƒ¼ãƒ‰ã‚’standalone-fullã¸
 sed -i s'/standalone.xml/standalone-full.xml/' /etc/wildfly/wildfly.conf
 
-# cf vi‚Ìê‡
+# cf viã®å ´åˆ
 #vi /etc/wildfly/wildfly.conf
 #WILDFLY_CONFIG=standalone.xml
 WILDFLY_CONFIG=standalone-full.xml
 
 
 
-¡ŠÇ—ƒ†[ƒUì¬
+â– ç®¡ç†ãƒ¦ãƒ¼ã‚¶ä½œæˆ
 /opt/wildfly/bin/add-user.sh
 
 What type of user do you wish to add?
  a) Management User (mgmt-users.properties)
  b) Application User (application-users.properties)
-œEnter->(a):
+â—Enter->(a):
 
 	Enter the details of the new user to add.
 	Using realm 'ManagementRealm' as discovered from the existing property files.
-œ“ü—Í->	Username : jbossadm
+â—å…¥åŠ›->	Username : jbossadm
 	Password recommendations are listed below. To modify these restrictions edit the add-user.properties configuration file.
 	 - The password should be different from the username
 	 - The password should not be one of the following restricted values {root, admin, administrator}
 	 - The password should contain at least 8 characters, 1 alphabetic character(s), 1 digit(s), 1 non-alphanumeric symbol(s)
-œ“ü—Í->	Password :
+â—å…¥åŠ›->	Password :
 	WFLYDM0101: Password should have at least 1 digit.
 	Are you sure you want to use the password entered yes/no? yes
-œ“ü—Í->	Re-enter Password :
+â—å…¥åŠ›->	Re-enter Password :
 	What groups do you want this user to belong to? (Please enter a comma separated list, or leave blank for none)[  ]:
 	About to add user 'jbossadm' for realm 'ManagementRealm'
-œyes->	Is this correct yes/no? yes
+â—yes->	Is this correct yes/no? yes
 	Added user 'jbossadm' to file '/opt/wildfly-14.0.0.Final/standalone/configuration/mgmt-users.properties'
 	Added user 'jbossadm' to file '/opt/wildfly-14.0.0.Final/domain/configuration/mgmt-users.properties'
 	Added user 'jbossadm' with groups  to file '/opt/wildfly-14.0.0.Final/standalone/configuration/mgmt-groups.properties'
 	Added user 'jbossadm' with groups  to file '/opt/wildfly-14.0.0.Final/domain/configuration/mgmt-groups.properties'
 	Is this new user going to be used for one AS process to connect to another AS process?
 	e.g. for a slave host controller connecting to the master or for a Remoting connection for server to server EJB calls.
-œyes->	yes/no? yes
+â—yes->	yes/no? yes
 	To represent the user add the following to the server-identities definition <secret value="amJvc3NwYXNzd29yZA==" />
 
-¡wildflyŠÇ—ƒRƒ“ƒ\[ƒ‹ ŠO•”ƒAƒNƒZƒX‰Â”\‚Ö•ÏX
+â– wildflyç®¡ç†ã‚³ãƒ³ã‚½ãƒ¼ãƒ« å¤–éƒ¨ã‚¢ã‚¯ã‚»ã‚¹å¯èƒ½ã¸å¤‰æ›´
 sed -i 's/127.0.0.1/0.0.0.0/g' /opt/wildfly/standalone/configuration/standalone-full.xml
 
 
-¡wildfly‹N“®
+â– wildflyèµ·å‹•
 systemctl start wildfly.service
 systemctl status wildfly.service
 
-¡port openŠm”F
-# 0.0.0.0‚ÅLISTEN‚µ‚Ä‚¢‚é‚±‚Æ
+â– port openç¢ºèª
+# 0.0.0.0ã§LISTENã—ã¦ã„ã‚‹ã“ã¨
 netstat -tpln | grep java
 
-¡ƒAƒNƒZƒX
+â– ã‚¢ã‚¯ã‚»ã‚¹
 http://ip.address:8080
 
 
-š”õl
-E‚±‚ê(vMem?)’²®‚¢‚é‚Ì‚Å‚ÍBÀ‹@Šm”F
+â˜…å‚™è€ƒ
+ãƒ»ã“ã‚Œ(vMem?)èª¿æ•´ã„ã‚‹ã®ã§ã¯ã€‚å®Ÿæ©Ÿç¢ºèª
 
 wildfly  27531 27476  3 02:58 ?        00:00:14 java -D[Standalone] -server -Xms64m -Xmx512m -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=256m -Djava.n
