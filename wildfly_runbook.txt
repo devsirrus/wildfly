@@ -29,11 +29,21 @@ systemctl enable wildfly.service
 ■wildfly起動モードをstandalone-fullへ
 sed -i s'/standalone.xml/standalone-full.xml/' /etc/wildfly/wildfly.conf
 
+■wildfly.confのWILDFLY_BIND=0.0.0.0を実IPに
+# 0.0.0.0で設定すればIPをサーバごとに埋め込まなくてよいが、管理コンソールからの
+# アプリケーションアクセスが http://0.0.0.0:8080/hello-world　の様になってしまう。
+# 外部への足がeth0の場合
+local_ip=$(ip a | grep eth0 | grep "inet " | sed -e 's!.*inet !!' -e 's!/.*!!g')
+sed -i "s/0.0.0.0/$local_ip/g" /etc/wildfly/wildfly.conf
+sed -i "s/standalone.xml/standalone-full.xml/g" /etc/wildfly/wildfly.conf
+
+
 # cf viの場合
 #vi /etc/wildfly/wildfly.conf
 #WILDFLY_CONFIG=standalone.xml
 WILDFLY_CONFIG=standalone-full.xml
-
+#WILDFLY_BIND=0.0.0.0
+WILDFLY_BIND=192.168.0.161
 
 
 ■管理ユーザ作成
@@ -68,7 +78,14 @@ What type of user do you wish to add?
 	To represent the user add the following to the server-identities definition <secret value="amJvc3NwYXNzd29yZA==" />
 
 ■wildfly管理コンソール 外部アクセス可能へ変更
-sed -i 's/127.0.0.1/0.0.0.0/g' /opt/wildfly/standalone/configuration/standalone-full.xml
+# 任意IPで設定する場合。(外部への足がeth0の場合)
+#local_ip=$(ip a | grep eth0 | grep "inet " | sed -e 's!.*inet !!' -e 's!/.*!!g')
+#sed -i "s/127.0.0.1/$local_ip/g" /opt/wildfly/standalone/configuration/standalone-full.xml
+
+# 0.0.0.0で設定する場合
+# こちらは任意IPでなくともよい
+sed -i 's/127.0.0.1/0.0.0.0/g'/opt/wildfly/standalone/configuration/standalone-full.xml 
+ 
 
 
 ■wildfly起動
@@ -76,12 +93,19 @@ systemctl start wildfly.service
 systemctl status wildfly.service
 
 ■port open確認
-# 0.0.0.0でLISTENしていること
+# 外部アドレスでLISTENしていること
 netstat -tpln | grep java
 
 ■アクセス
 http://ip.address:8080
 
+■テスト
+# テストwarファイルDL
+https://github.com/efsavage/hello-world-war/raw/master/dist/hello-world.war
+
+# 管理コンソールからデプロイ
+Deployments - Upload Deploymentからhelo-world.warをアップロード(enableで）
+「Context Root /hello-world」のハイパーリンクをクリックしてアクセスできること。
 
 ★備考
 ・これ(vMem?)調整いるのでは。実機確認
